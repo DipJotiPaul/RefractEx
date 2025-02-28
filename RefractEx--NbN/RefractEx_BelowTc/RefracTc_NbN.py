@@ -57,8 +57,8 @@ hbar = 1.0546e-34
 eps0 = 8.854e-12
 sigmaN = 1/(2640.3e-9)                 # normal state conductivity
 kB = 1.380649e-23                      # constant
-T = 4                                  # NbN: Tc 8.9 K, T < Tc
-Tc = 8.9
+T = 4                                  # NbN: Tc 6.9 K, T < Tc
+Tc = 6.9
 delta0 = 0.5*3.52*kB*Tc
 delta = delta0*1.74*np.sqrt(1-(T/Tc))
 Ereduce = np.linspace(0.1,1050, 9000)
@@ -115,4 +115,3 @@ plt.legend()
 plt.figure(2)
 plt.plot(wv, np.imag(ncal), color='red', linestyle='dashed', label='FTIR, @ 290K')
 plt.legend()
-
