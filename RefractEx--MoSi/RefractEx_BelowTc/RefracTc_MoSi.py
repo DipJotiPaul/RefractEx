@@ -51,14 +51,17 @@ def epsi_integration(omegas, delta, hbar, eps0, sigmaN, kB, T):
         integral_values.append(prefactor*(2*integral_value1+integral_value2))
     return integral_values
 
-#%% MoSi
+# MoSi:
 eV = 1.602e-19 
 hbar = 1.0546e-34
 eps0 = 8.854e-12
-sigmaN = 1/(2120.65e-9)                # normal state conductivity
+thickness = 14.98e-9 
+Rsheet = 110.51
+sigmaN = 1/(thickness*Rsheet)            # normal state conductivity
+# sigmaN = 1/(1720.65e-9)                # normal state conductivity
 kB = 1.380649e-23                      # constant
-T = 4                                  # MoSi: Tc 5.4 K, T < Tc
-Tc = 5.4
+T = 4                                  # MoSi: Tc 5.23 K, T < Tc
+Tc = 5.23
 delta0 = 0.5*3.52*kB*Tc
 delta = delta0*1.74*np.sqrt(1-(T/Tc))
 Ereduce = np.linspace(0.1,1050, 9000)
@@ -66,7 +69,7 @@ omegas = Ereduce*2*delta/hbar
 wv = 2*np.pi*3e8/omegas*1e6            # unit in um
 omega_delta = 2*delta/hbar
 # omega_plasma = 57.5e12
-wv_delta = 2*np.pi*3e8/omega_delta*1e6              # unit in um
+wv_delta = 2*np.pi*3e8/omega_delta*1e6            # unit in um
 # wv_plasma = 2*np.pi*3e8/omega_plasma*1e6          # unit in um
 epsr_result = epsr_integration(omegas, delta, hbar, eps0, sigmaN, kB, T)
 epsi_result = epsi_integration(omegas, delta, hbar, eps0, sigmaN, kB, T)
@@ -81,7 +84,7 @@ nk_result = np.sqrt(np.abs(epsr_result)+1j*np.abs(epsi_result))
 # wv_zero = 2*np.pi*3e8/omega_zero*1e6
 # print('Zero crossing of epsr at wv : '+str(wv_zero)+' um')
 
-#%% Plotting
+# Plotting
 plt.figure(1)
 plt.plot(wv, np.real(nk_result), color='blue', label='BCS theory, @ 4K')
 plt.ylabel('Refractive index, n')
@@ -99,10 +102,12 @@ plt.xlabel('wv [um]')
 plt.grid(True)
 scipy.io.savemat('MoSi_nk_4K.mat', {'wv': wv, 'nk_result': nk_result})
 
-#%% Matlab compare
-x = np.array([1.127461510506305, 14.245125499784351, 5.780781253337324, 
-              19.649609489208387, 4.873159703434938, 14.681656921944104,
-              3.144758491240632, 0.338559239864453, 1.011683444359494])
+
+# Matlab compare
+# x = np.array([1.127461510506305, 14.245125499784351, 5.780781253337324, 
+#               19.649609489208387, 4.873159703434938, 14.681656921944104,
+#               3.144758491240632, 0.338559239864453, 1.011683444359494])
+x = np.array([1.15015, 15.01319, 5.53256, 20.60844, 5.00947, 15.49957, 3.23873, 0.36090, 1.02242])
 wv = np.linspace(0.1, 30, 5000)
 omega = 1.2398 / wv
 Drude = x[1]**2 / (omega**2 + 1j * omega * x[2])
@@ -110,11 +115,13 @@ Lorentz = x[3]**2 / (x[4]**2 - omega**2 - 1j * omega * x[5])
 Lorentz1 = x[6]**2 / (x[7]**2 - omega**2 - 1j * omega * x[8])
 ncal = np.sqrt(x[0] - Drude + Lorentz + Lorentz1)
 
+# Plotting
 plt.figure(1)
 plt.plot(wv, np.real(ncal), color='blue', linestyle='dashed', label='FTIR, @ 290K')
 plt.legend()
+# plt.savefig('MoSi_n.png', dpi=300, bbox_inches='tight')
 
 plt.figure(2)
 plt.plot(wv, np.imag(ncal), color='red', linestyle='dashed', label='FTIR, @ 290K')
 plt.legend()
-
+# plt.savefig('MoSi_k.png', dpi=300, bbox_inches='tight')

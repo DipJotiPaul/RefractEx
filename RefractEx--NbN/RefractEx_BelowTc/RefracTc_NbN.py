@@ -51,14 +51,17 @@ def epsi_integration(omegas, delta, hbar, eps0, sigmaN, kB, T):
         integral_values.append(prefactor*(2*integral_value1+integral_value2))
     return integral_values
 
-#%% NbN
+# NbN:
 eV = 1.602e-19 
 hbar = 1.0546e-34
 eps0 = 8.854e-12
-sigmaN = 1/(2640.3e-9)                 # normal state conductivity
+thickness = 9.93e-9 
+Rsheet = 240.68
+sigmaN = 1/(thickness*Rsheet)            # normal state conductivity
+# sigmaN = 1/(2340.3e-9)                 # normal state conductivity
 kB = 1.380649e-23                      # constant
-T = 4                                  # NbN: Tc 6.7 K, T < Tc
-Tc = 6.7
+T = 4                                  # NbN on CaF2: Tc 9.67 K, T < Tc
+Tc = 9.67
 delta0 = 0.5*3.52*kB*Tc
 delta = delta0*1.74*np.sqrt(1-(T/Tc))
 Ereduce = np.linspace(0.1,1050, 9000)
@@ -66,7 +69,7 @@ omegas = Ereduce*2*delta/hbar
 wv = 2*np.pi*3e8/omegas*1e6            # unit in um
 omega_delta = 2*delta/hbar
 # omega_plasma = 57.5e12
-wv_delta = 2*np.pi*3e8/omega_delta*1e6              # unit in um
+wv_delta = 2*np.pi*3e8/omega_delta*1e6            # unit in um
 # wv_plasma = 2*np.pi*3e8/omega_plasma*1e6          # unit in um
 epsr_result = epsr_integration(omegas, delta, hbar, eps0, sigmaN, kB, T)
 epsi_result = epsi_integration(omegas, delta, hbar, eps0, sigmaN, kB, T)
@@ -81,7 +84,7 @@ nk_result = np.sqrt(np.abs(epsr_result)+1j*np.abs(epsi_result))
 # wv_zero = 2*np.pi*3e8/omega_zero*1e6
 # print('Zero crossing of epsr at wv : '+str(wv_zero)+' um')
 
-#%% Plotting
+# Plotting
 plt.figure(1)
 plt.plot(wv, np.real(nk_result), color='blue', label='BCS theory, @ 4K')
 plt.ylabel('Refractive index, n')
@@ -99,19 +102,23 @@ plt.xlabel('wv [um]')
 plt.grid(True)
 scipy.io.savemat('NbN_nk_4K.mat', {'wv': wv, 'nk_result': nk_result})
 
-#%% Matlab compare
-x = np.array([6.906980816237389, 6.716385517669770, 1.599998412858263, 
-              17.847903843066636, 1.935406412562817, 19.999981207736077])
+# Matlab compare
+# x = np.array([6.906980816237389, 6.716385517669770, 1.599998412858263, 
+#               17.847903843066636, 1.935406412562817, 19.999981207736077])
+x = np.array([6.91207, 6.93347, 1.65748, 18.14436, 1.98157, 21.40542])
 wv = np.linspace(0.1, 30, 5000)
 omega = 1.2398 / wv
 Drude = x[1]**2 / (omega**2 + 1j * omega * x[2])
 Lorentz = x[3]**2 / (x[4]**2 - omega**2 - 1j * omega * x[5])
 ncal = np.sqrt(x[0] - Drude + Lorentz)
 
+# Plotting
 plt.figure(1)
 plt.plot(wv, np.real(ncal), color='blue', linestyle='dashed', label='FTIR, @ 290K')
 plt.legend()
+# plt.savefig('NbN_n.png', dpi=300, bbox_inches='tight')
 
 plt.figure(2)
 plt.plot(wv, np.imag(ncal), color='red', linestyle='dashed', label='FTIR, @ 290K')
 plt.legend()
+# plt.savefig('NbN_k.png', dpi=300, bbox_inches='tight')

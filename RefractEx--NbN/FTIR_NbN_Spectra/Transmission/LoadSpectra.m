@@ -2,8 +2,7 @@
 % Imports the absorbance data in .SPA spectrum files into a set of arrays 
 % with data from the selected files stored in columns.
 
-function [Wavelengths,Spectra,Spectras] = LoadSpectra(path,Filename,snum,root)
-    cd(path);
+function [Wavelengths,Spectra,Spectras] = LoadSpectra(Filename,snum)
     fid=fopen(Filename,'r');
     fseek(fid,30,'bof');
 %     SpectraTitles={char(nonzeros(fread(fid,255,'uint8'))')};
@@ -39,6 +38,5 @@ function [Wavelengths,Spectra,Spectras] = LoadSpectra(path,Filename,snum,root)
     end 
     Spectras=smoothdata(Spectra,'gaussian',snum);
     fclose(fid);
-    cd(root);
 end
     
